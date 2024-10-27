@@ -6,7 +6,7 @@ function _natural_selection_replace_selection --description 'Replaces selection 
   #check if it was copied via terminal or via natural_selection
   #don't know how to fix an extra token in the end from _natural_selection_get_selection
   #so this is a workaround
-  if test -z $replacement[-1]
+  if test -z $argv[-1]
         set -f replacement $argv[1..-2]
   else
         set -f replacement $argv
