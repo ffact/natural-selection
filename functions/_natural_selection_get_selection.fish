@@ -21,6 +21,6 @@ function _natural_selection_get_selection --description 'Echoes the selection'
 
   set --local selection_length (math $selection_end - $selection_start)
   set --local buffer (commandline --current-buffer)
-  #
-  echo -ns -- (string sub --start $selection_start --length $selection_length -- "$buffer")
+
+  string sub --start $selection_start --length $selection_length -- (commandline  | string split0)
 end
