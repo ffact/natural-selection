@@ -2,8 +2,16 @@ function _natural_selection_replace_selection --description 'Replaces selection 
   # Get arguments
   set --local options (fish_opt --short i --long inset-selection-by --long-only --required-val)
   argparse --name '_natural_selection_replace_selection' $options -- $argv
-  set --local replacement "$argv"
-
+  
+  #check if it was copied via terminal or via natural_selection
+  #don't know how to fix an extra token in the end from _natural_selection_get_selection
+  #so this is a workaround
+  if test -z $replacement[-1]
+        set -f replacement $argv[1..-2]
+  else
+        set -f replacement $argv
+  end
+  
   # Required parameters
   if test -z "$replacement"
     _natural_selection_end_selection
@@ -12,8 +20,7 @@ function _natural_selection_replace_selection --description 'Replaces selection 
 
   # Pass through if not selecting
   if not _natural_selection_is_selecting
-    # Quote and -- just in case
-    commandline --insert -- "$replacement"
+    commandline --insert -- $replacement
     return
   end
 
@@ -31,12 +38,15 @@ function _natural_selection_replace_selection --description 'Replaces selection 
   end
 
   # Get before and after selection so we can replace the entire commandline
-  set --local buffer (commandline --current-buffer)
-  set --local head (string sub --length $selection_left_edge -- "$buffer")
-  set --local tail (string sub --start (math $selection_right_edge + 1) -- "$buffer")
+  set --local buffer (commandline --current-buffer | string split0)
+  set --local head (string sub --length $selection_left_edge -- $buffer)
+  set --local tail (string sub --start (math $selection_right_edge + 1) -- $buffer)
   # Replace commandline with new selection. Quote and -- just in case
-  commandline --replace -- "$head$replacement$tail"
-
+  commandline --replace ""
+  commandline --insert -- $head
+  commandline --insert -- $replacement
+  commandline --insert -- $tail
+  
   # Support wrapping libaries (eg. wrapping selection in quotes)
   if test -n "$_flag_inset_selection_by"
     # Selection can go in either direction so it is easier to use selection length when reselecting
