@@ -63,6 +63,7 @@ function _natural_selection --description 'Input wrapper to improve selection'
       else
         _natural_selection_get_selection | pbcopy
       end
+      _natural_selection end-selection
     end
   else if test $input_function = "cut-to-clipboard"
     # Do not cut empty selection.
